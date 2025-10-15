@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from datetime import datetime
+
 st.set_page_config(layout="wide")
 
 st.markdown(
@@ -16,6 +18,11 @@ st.markdown(
 
 st.title('DNJ 2025 - Diocese de São José dos Pinhais')
 st.subheader('Lista de Inscritos')
+# Ultima atualização em:
+
+ultima_atualizacao = datetime.now().strftime('%d/%m/%Y %H:%M')
+st.write(f'Última atualização em: {ultima_atualizacao}')
+
 st.divider()
 df = pd.read_excel('lista-inscritos-dnj-2025-diocese-de-sao-jose-dos-pinhais-tratado.xlsx')
 
@@ -27,8 +34,10 @@ st.sidebar.title('Filtros')
 
 # Criar um filtro para a coluna "Paróquia"
 paroquias = df['Paróquia'].sort_values().unique()
-
 paroquias = np.insert(paroquias, 0, '')  # Adicionar uma opção vazia no início
+
+
+
 paroquia_selecionada = st.sidebar.selectbox('Selecione a Paróquia', paroquias)
 
 # Se não tiver nenhuma paróquia selecionada, não mostrar nada
