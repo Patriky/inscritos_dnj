@@ -27,7 +27,7 @@ st.subheader('Lista de Inscritos')
 
 
 # ultima_atualizacao = datetime.now().strftime('%d/%m/%Y %H:%M')
-ultima_atualizacao = '27/10/2024 14:30'  # Colocar a data manualmente por enquanto
+ultima_atualizacao = '16/10/2024 9:00'  # Colocar a data manualmente por enquanto
 st.write(f'Última atualização em: {ultima_atualizacao}')
 
 
