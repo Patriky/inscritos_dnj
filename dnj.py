@@ -79,7 +79,6 @@ except Exception as e:
 st.divider()
 
 df = df.sort_values(by=['Paróquia', 'Nome'])
-df["nome_normalizado"] = df["Nome"].apply(_normalize_str)   
 
 st.sidebar.title('Filtros')
 
@@ -112,7 +111,7 @@ else:  # Pesquisar por Nome
         st.stop()
 
     # Busca case-insensitive por substring na coluna "Nome"
-    df_filtrado = df[df['nome_normalizado'].astype(str).str.contains(nome_busca, case=False, na=False)]
+    df_filtrado = df[df['Nome'].apply(_normalize_str).str.contains(nome_busca, case=False, na=False)]
 
 st.dataframe(df_filtrado)
 st.write(f'Total de inscritos: {len(df_filtrado)}')
