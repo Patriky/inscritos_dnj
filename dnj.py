@@ -3,12 +3,39 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from pathlib import Path
+import re
+import unicodedata
+
+# tenta usar unidecode (melhor para remover acentos); se não tiver, usa unicodedata
+try:
+    from unidecode import unidecode
+    _use_unidecode = True
+except Exception:
+    _use_unidecode = False
+
+
+
+def _normalize_str(s: object) -> str:
+    """Normaliza uma string:
+    - converte pra str, lower, strip
+    - remove acentuação (unidecode ou unicodedata)
+    - remove tudo que não for letra (a-z) — assim retiramos números, espaços, special chars
+    """
+    s = '' if s is None else str(s)
+    s = s.lower().strip()
+    if _use_unidecode:
+        s = unidecode(s)
+    else:
+        s = unicodedata.normalize('NFKD', s)
+        s = s.encode('ascii', 'ignore').decode('ascii')
+    # mantém somente letras a-z (remove números, espaços, pontuação, etc.)
+    s = re.sub(r'[^a-z]', '', s)
+    return s
 
 st.set_page_config(layout="wide")
 
 #Centralizar a imagem no topo
 st.image("images/logo_padrao.png", width=200)
-
 
 st.markdown(
     """
@@ -53,7 +80,6 @@ st.divider()
 
 df = df.sort_values(by=['Paróquia', 'Nome'])
 
-
 st.sidebar.title('Filtros')
 
 
@@ -77,12 +103,15 @@ if modo_pesquisa == "Pesquisar por Paróquia":
 
 else:  # Pesquisar por Nome
     nome_busca = st.sidebar.text_input('Digite o nome para pesquisar (parte do nome ou completo):', '')
-    if nome_busca.strip() == '':
+    # Normaliza o input para evitar problemas com espaços extras, acentuação, etc.
+    nome_busca = _normalize_str(nome_busca)
+
+    if nome_busca == '':
         st.write('Nenhum nome informado para pesquisa')
         st.stop()
 
     # Busca case-insensitive por substring na coluna "Nome"
-    df_filtrado = df[df['Nome'].astype(str).str.contains(nome_busca, case=False, na=False)]
+    df_filtrado = df[df['Nome'].apply(_normalize_str).str.contains(nome_busca, case=False, na=False)]
 
 st.dataframe(df_filtrado)
 st.write(f'Total de inscritos: {len(df_filtrado)}')
